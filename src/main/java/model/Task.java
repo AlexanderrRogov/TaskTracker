@@ -1,18 +1,14 @@
-package org.home;
+package model;
 
 
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Objects;
-import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.concurrent.atomic.AtomicInteger;
 
 
 public class Task {
     private String name;
     private String info;
-    private final Integer id = ThreadLocalRandom.current().nextInt(Integer.MIN_VALUE, Integer.MAX_VALUE);
+    private final Integer id = ThreadLocalRandom.current().nextInt(1, Integer.MAX_VALUE);
     private TaskStatus taskStatus;
 
 
@@ -71,6 +67,11 @@ public class Task {
         this.name = name;
         this.info = info;
         this.taskStatus = taskStatus;
+    }
+
+    public Task(String name, String info) {
+        this.name = name;
+        this.info = info;
     }
 
 

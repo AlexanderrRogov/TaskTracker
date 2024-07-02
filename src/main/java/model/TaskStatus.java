@@ -1,4 +1,4 @@
-package org.home;
+package model;
 
 public enum TaskStatus {
     NEW,
