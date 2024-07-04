@@ -1,11 +1,19 @@
+import controller.InMemoryTaskManager;
 import controller.TaskManager;
 import model.Epic;
 import model.Subtask;
 import model.Task;
 import model.TaskStatus;
+import util.Managers;
+import util.TaskStatusUpdater;
 
 public class Main {
     public static void main(String[] args) {
+        TaskManager taskManager = Managers.getDefault();
+        printAllTasks(taskManager);
+    }
+
+    private static void printAllTasks(TaskManager taskManager) {
         Task task0 = new Task("Сервис транзакций_V1", "Написать сервис для передачи информации по проводкам", TaskStatus.NEW);
         Task task1 = new Task("Сервис транзакций_V2", "Написать сервис для передачи информации по проводкам", TaskStatus.IN_PROGRESS);
 
@@ -21,8 +29,6 @@ public class Main {
         epic1.setSubTaskIds(subtask2.getId());
 
 
-
-        TaskManager taskManager = new TaskManager();
         taskManager.addTask(task0);
         taskManager.addTask(task1);
         taskManager.addEpic(epic0);
@@ -32,62 +38,52 @@ public class Main {
         taskManager.addSubtask(subtask2);
 
 
-        for (Task task :taskManager.getTasks()) {
-            System.out.println(task.toString());
+        System.out.println("Задачи:");
+        for (Task task : taskManager.getTasks()) {
+            System.out.println(task);
         }
+        System.out.println("Эпики:");
+        for (Task epic : taskManager.getEpics()) {
+            System.out.println(epic);
 
-        for (Subtask subtask : taskManager.getSubtasks()) {
-            System.out.println(subtask.toString());
-        }
-
-        for (Epic epic :taskManager.getEpics()) {
-            System.out.println(epic.toString());
-        }
-
-
-        var task0ById = taskManager.getTask(task0.getId());
-        task0ById.setInfo("Новое инфо");
-        task0ById.setName("Новое название");
-        task0ById.setTaskStatus(TaskStatus.DONE);
-        taskManager.addTask(task0);
-
-        var task1ById = taskManager.getTask(task1.getId());
-        task1ById.setTaskStatus(TaskStatus.DONE);
-        taskManager.addTask(task1ById);
-
-        var subtasks = taskManager.getSubtasks();
-
-        for (Subtask subtask : subtasks) {
-            if(subtask.getId().equals(subtask0.getId())) {
-                subtask.setTaskStatus(TaskStatus.DONE);
-                taskManager.addSubtask(subtask);
+            for (Task task : taskManager.getSubtasksForEpic(epic.getId())) {
+                System.out.println("--> " + task);
             }
         }
-
-        var subTask1ById = taskManager.getSubtask(subtask1.getId());
-        subTask1ById.setTaskStatus(TaskStatus.DONE);
-        taskManager.addSubtask(subtask1);
-
-        var subTask2ById = taskManager.getSubtask(subtask2.getId());
-        subTask2ById.setTaskStatus(TaskStatus.DONE);
-        taskManager.addSubtask(subtask2);
-
-        for (Task task :taskManager.getTasks()) {
-            System.out.println(task.toString());
+        System.out.println("Подзадачи:");
+        for (Task subtask : taskManager.getSubtasks()) {
+            System.out.println(subtask);
         }
 
-        for (Subtask subtask : taskManager.getSubtasks()) {
-            System.out.println(subtask.toString());
-        }
 
-        for (Epic epic :taskManager.getEpics()) {
-            System.out.println(epic.toString());
-        }
+        taskManager.getTask(task0.getId());
+        taskManager.getSubtask(subtask2.getId());
+        taskManager.getEpic(epic0.getId());
+        taskManager.getTask(task0.getId());
+        taskManager.getSubtask(subtask2.getId());
+        taskManager.getEpic(epic0.getId());
+        taskManager.getTask(task0.getId());
+        taskManager.getSubtask(subtask2.getId());
+        taskManager.getEpic(epic0.getId());
+        taskManager.getSubtask(subtask2.getId());
 
-        taskManager.deleteSubtask(subtask2.getId());
+        taskManager.getEpic(epic0.getId());
+        taskManager.getTask(task0.getId());
+        taskManager.getSubtask(subtask2.getId());
+        taskManager.getTask(task0.getId());
+        taskManager.getSubtask(subtask2.getId());
+        taskManager.getEpic(epic0.getId());
+        taskManager.getSubtask(subtask2.getId());
+        taskManager.getSubtask(subtask2.getId());
+        taskManager.getEpic(epic0.getId());
+        taskManager.getTask(task0.getId());
 
-        for (Epic epic :taskManager.getEpics()) {
-            System.out.println(epic.toString());
+        taskManager.getTask(task0.getId());
+
+
+        System.out.println("История:");
+        for (Task task : taskManager.getHistory()) {
+            System.out.println(task);
         }
     }
 }

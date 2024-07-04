@@ -6,26 +6,11 @@ import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
 
-public class Epic  {
+public class Epic extends Task {
 
     private TaskStatus epicStatus = TaskStatus.NEW;
 
-    private String name;
-    private String info;
-    private final Integer id = ThreadLocalRandom.current().nextInt(1, Integer.MAX_VALUE);
-
     private final ArrayList<Integer> subTaskIds = new ArrayList<>();
-    public String getName() {
-        return name;
-    }
-
-    public String getInfo() {
-        return info;
-    }
-
-    public Integer getId() {
-        return id;
-    }
 
     public void setSubTaskIds(Integer id) {
         this.subTaskIds.add(id);
@@ -39,27 +24,19 @@ public class Epic  {
         subTaskIds.clear();
     }
 
-    public void setInfo(String info) {
-        this.info = info;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
 
     @Override
     public String toString() {
         return "Epic{" +
-                "name='" + name + '\'' +
-                ", info='" + info + '\'' +
-                ", id=" + id +
+                "name='" + getName() + '\'' +
+                ", info='" + getInfo() + '\'' +
+                ", id=" + getId() +
                 ", taskStatus=" + epicStatus +
                 '}';
     }
 
     public Epic(String name, String info) {
-        this.name = name;
-        this.info = info;
+        super(name, info);
     }
 
     public Epic updateEpicStatus(ArrayList<Subtask> subtaskArrayList) {

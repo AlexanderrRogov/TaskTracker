@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="RemoteRepositoriesConfiguration">
+    <remote-repository>
+      <option name="id" value="remote-mvn" />
+      <option name="name" value="remote-mvn" />
+      <option name="url" value="https://artifactory.raiffeisen.ru/artifactory/remote-mvn" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="ext-release-mvn" />
+      <option name="name" value="ecom-release-mvn" />
+      <option name="url" value="https://artifactory.raiffeisen.ru/artifactory/ext-release-mvn" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="central" />
+      <option name="name" value="central" />
+      <option name="url" value="http://repo1.maven.org/maven2" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="ecom-snapshot-mvn" />
+      <option name="name" value="ecom-snapshot-mvn" />
+      <option name="url" value="https://artifactory.raiffeisen.ru/artifactory/ecom-snapshot-mvn" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="central" />
+      <option name="name" value="Maven Central repository" />
+      <option name="url" value="https://repo1.maven.org/maven2" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="jboss.community" />
+      <option name="name" value="JBoss Community repository" />
+      <option name="url" value="https://repository.jboss.org/nexus/content/repositories/public/" />
+    </remote-repository>
+    <remote-repository>
+      <option name="id" value="ecom-release-mvn" />
+      <option name="name" value="ecom-release-mvn" />
+      <option name="url" value="https://artifactory.raiffeisen.ru/artifactory/ecom-release-mvn" />
+    </remote-repository>
+  </component>
+</project>
