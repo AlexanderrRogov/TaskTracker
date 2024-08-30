@@ -2,8 +2,6 @@ package model;
 
 import controller.HistoryManager;
 import controller.TaskManager;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -69,7 +67,7 @@ class TrackerTests {
     @Test
     void add() {
         HistoryManager historyManagerAdd = Managers.getDefaultHistory();
-        historyManagerAdd.updateHistory(task0);
+        historyManagerAdd.addTask(task0);
         final List<Task> history = historyManagerAdd.getHistory();
         assertNotNull(history, "История не пустая.");
         assertEquals(1, history.size(), "История не пустая.");
