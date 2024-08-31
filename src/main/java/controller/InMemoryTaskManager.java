@@ -136,7 +136,7 @@ public class InMemoryTaskManager implements TaskManager {
     public void updateEpicStatus(Integer epicId) {
         epics.put(epicId, epics.get(epicId).updateEpicStatus(getSubtasksForEpic(epicId)));
     }
-//
+
     public List<Task> getHistory() {
         return historyManager.getHistory();
     }
