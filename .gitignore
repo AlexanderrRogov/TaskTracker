@@ -1,2 +1,3 @@
-target/classes
+target
 .idea
+target/classes/org/home
