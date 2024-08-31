@@ -90,7 +90,7 @@ public class InMemoryTaskManager implements TaskManager {
         historyManager.addTask(epics.get(id));
         return epics.get(id);
     }
-    //
+
     @Override
     public void deleteTask(Integer id) {
         tasks.clear();
