@@ -5,7 +5,6 @@ import model.Subtask;
 import model.Task;
 import model.TaskStatus;
 import util.Managers;
-import util.TaskStatusUpdater;
 
 public class Main {
     public static void main(String[] args) {
