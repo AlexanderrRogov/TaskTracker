@@ -4,10 +4,12 @@ import java.util.Objects;
 
 public class Subtask extends Task {
 
-    TaskStatus taskStatus;
-
     public Subtask(String name, String info, TaskStatus taskStatus) {
         super(name, info, taskStatus);
+    }
+
+    public Subtask(Task task) {
+        super(task.getName(), task.getInfo(), task.getTaskStatus());
     }
 
     @Override
