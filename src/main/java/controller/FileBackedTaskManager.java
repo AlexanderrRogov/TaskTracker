@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.stream.Collectors;
 
-public class FileBackedTaskManager extends InMemoryTaskManager implements TaskManager {
+public class FileBackedTaskManager extends InMemoryTaskManager {
 
 
     public FileBackedTaskManager() {
@@ -31,7 +31,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         return read();
     }
 
-    ArrayList<String> taskToString(Task task) {
+    private ArrayList<String> taskToString(Task task) {
         var type = task.toString().substring(0, task.toString().indexOf('{'));
         ArrayList<String[]> tempArr = new ArrayList<>();
         for (var t : task.toString().split(",")) {
@@ -155,5 +155,66 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
     public void addTask(Task task) {
         tasks.put(task.getId(), task);
         save(task);
+    }
+
+    @Override
+    public void deleteTask(Integer id) {
+        Task deletedTask = tasks.remove(id);
+        save(deletedTask);
+    }
+
+    @Override
+    public void deleteSubtask(Integer id) {
+        var deletedSubTask = subtasks.remove(id);
+        save(deletedSubTask);
+        for (Epic epic : epics.values()) {
+            if (epic.getSubTaskIds().contains(id))
+            {
+                epic.getSubTaskIds().remove(id);
+                updateEpicStatus(epic.getId());
+            }
+        }
+    }
+    @Override
+    public void deleteEpic(Integer id) {
+       var deletedEpic = epics.remove(id);
+       save(deletedEpic);
+    }
+
+    @Override
+    public void updateEpicStatus(Integer epicId) {
+        epics.put(epicId, epics.get(epicId).updateEpicStatus(getSubtasksForEpic(epicId)));
+        save(epics.get(epicId));
+    }
+
+    @Override
+    public ArrayList<Epic> getEpics() {
+        ArrayList<Epic> epicCollection =  new ArrayList<>(epics.values());
+        for (Epic epic : epicCollection) {
+            save(epic);
+        }
+        return epicCollection;
+    }
+
+    @Override
+    public Task getTask(int id) {
+        var task = tasks.get(id);
+        historyManager.addTask(task);
+        save(task);
+        return task;
+    }
+    @Override
+    public Subtask getSubtask(int id) {
+        var subtask = subtasks.get(id);
+        historyManager.addTask(subtask);
+        save(subtask);
+        return subtask;
+    }
+    @Override
+    public Epic getEpic(int id) {
+        var epic = epics.get(id);
+        historyManager.addTask(epic);
+        save(epic);
+        return epic;
     }
 }
