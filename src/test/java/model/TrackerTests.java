@@ -1,5 +1,6 @@
 package model;
 
+import controller.FileBackedTaskManager;
 import controller.HistoryManager;
 import controller.TaskManager;
 import org.junit.jupiter.api.BeforeAll;
@@ -7,6 +8,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import util.Managers;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -71,6 +74,16 @@ class TrackerTests {
         final List<Task> history = historyManagerAdd.getHistory();
         assertNotNull(history, "История не пустая.");
         assertEquals(1, history.size(), "История не пустая.");
+    }
+
+    @Test
+    void saveToFile() {
+        FileBackedTaskManager fileBackedTaskManager = Managers.getFileBackedTaskManager();
+        fileBackedTaskManager.addTask(task0);
+        fileBackedTaskManager.addEpic(epic0);
+        fileBackedTaskManager.addSubtask(subtask1);
+        final HashMap<TaskType, ArrayList<? extends Task>> restoredTasks = FileBackedTaskManager.loadFromFile();
+        assertNotNull(restoredTasks, "Файлы восстановлены");
     }
 
     @Test

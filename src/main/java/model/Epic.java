@@ -1,9 +1,7 @@
 package model;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Objects;
-import java.util.concurrent.ThreadLocalRandom;
 
 
 public class Epic extends Task {
@@ -11,6 +9,8 @@ public class Epic extends Task {
     private TaskStatus epicStatus = TaskStatus.NEW;
 
     private final ArrayList<Integer> subTaskIds = new ArrayList<>();
+
+
 
     public void setSubTaskIds(Integer id) {
         this.subTaskIds.add(id);
@@ -37,6 +37,10 @@ public class Epic extends Task {
 
     public Epic(String name, String info) {
         super(name, info);
+    }
+
+    public Epic(Task task) {
+        super(task.getName(), task.getInfo());
     }
 
     public Epic updateEpicStatus(ArrayList<Subtask> subtaskArrayList) {

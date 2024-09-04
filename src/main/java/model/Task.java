@@ -6,12 +6,15 @@ import java.util.concurrent.ThreadLocalRandom;
 
 
 public class Task {
+    private String type;
     private String name;
     private String info;
-    private final Integer id = ThreadLocalRandom.current().nextInt(1, Integer.MAX_VALUE);
+    private Integer id = ThreadLocalRandom.current().nextInt(1, Integer.MAX_VALUE);
     private TaskStatus taskStatus;
 
-
+    public String getType() {
+        return type;
+    }
 
     @Override
     public String toString() {
@@ -63,6 +66,14 @@ public class Task {
         this.name = name;
         this.info = info;
         this.taskStatus = taskStatus;
+    }
+
+    public Task(String type, String name, String info, String id, TaskStatus taskStatus) {
+        this.name = name;
+        this.info = info;
+        this.taskStatus = taskStatus;
+        this.id = Integer.valueOf(id);
+        this.type = type;
     }
 
     public Task(String name, String info) {
