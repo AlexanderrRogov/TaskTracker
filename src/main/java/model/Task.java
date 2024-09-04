@@ -1,6 +1,10 @@
 package model;
 
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.util.Objects;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -11,9 +15,16 @@ public class Task {
     private String info;
     private Integer id = ThreadLocalRandom.current().nextInt(1, Integer.MAX_VALUE);
     private TaskStatus taskStatus;
+    private Duration duration;
+    private LocalDateTime startTime;
 
     public String getType() {
         return type;
+    }
+
+    public LocalDateTime getEndTime() {
+      var endTime=  startTime.toInstant(ZoneOffset.UTC).plus(duration);
+      return LocalDateTime.ofInstant(endTime, ZoneOffset.UTC);
     }
 
     @Override
