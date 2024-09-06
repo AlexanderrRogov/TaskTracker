@@ -7,8 +7,10 @@ import model.Task;
 import util.Managers;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.TreeSet;
 
 public class InMemoryTaskManager implements TaskManager {
 
@@ -32,14 +34,9 @@ public class InMemoryTaskManager implements TaskManager {
         ArrayList<Subtask> epicSub = new ArrayList<>();
         if(id != 0) {
             if (!epics.get(id).getSubTaskIds().isEmpty()) {
-                for (Subtask subtask : subtasks.values()) {
-
-                    for (Integer i : epics.get(id).getSubTaskIds()) {
-                        if (subtask.getId().equals(i)) {
-                            epicSub.add(subtask);
-                        }
-                    }
-                }
+                subtasks.values().forEach(subtask -> {
+                    epics.get(id).getSubTaskIds().stream().filter(i -> subtask.getId().equals(i)).map(i -> subtask).forEach(epicSub::add);
+                });
             } else {
                 return new ArrayList<>();
             }
@@ -51,17 +48,17 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void addTask(Task task) {
-        tasks.put(task.getId(), task);
+        if (IsIntersect(task)) {
+            tasks.put(task.getId(), task);
+        } else {
+            System.out.println("Есть пересечение по времени");
+        }
     }
 
     @Override
     public void addSubtask(Subtask subtask) {
         subtasks.put(subtask.getId(), subtask);
-        for(Epic epic : epics.values()) {
-            if(epic.getSubTaskIds().contains(subtask.getId())) {
-                updateEpicStatus(epic.getId());
-            }
-        }
+        epics.values().stream().filter(epic -> epic.getSubTaskIds().contains(subtask.getId())).forEach(epic -> {updateEpicStatus(epic.getId());});
     }
     @Override
     public void addEpic(Epic epic) {
@@ -136,5 +133,19 @@ public class InMemoryTaskManager implements TaskManager {
 
     public List<Task> getHistory() {
         return historyManager.getHistory();
+    }
+
+    public TreeSet<Task> getPrioritizedTasks() {
+        TreeSet<Task> prioritizedTasks = new TreeSet<>(Comparator.comparing(Task::getStartTime));
+        prioritizedTasks.addAll(tasks.values());
+        prioritizedTasks.addAll(epics.values());
+        prioritizedTasks.addAll(subtasks.values());
+        return prioritizedTasks;
+    }
+
+    public Boolean IsIntersect(Task task) {
+      return   getPrioritizedTasks().stream().anyMatch(x -> x.getStartTime().isAfter(task.getStartTime()) && x.getEndTime().isBefore(task.getEndTime()) ||
+                x.getStartTime().equals(task.getStartTime()) && x.getEndTime().equals(task.getEndTime()) || x.getStartTime().isBefore(task.getEndTime()) && x.getEndTime().isAfter(task.getStartTime())
+              || x.getEndTime().equals(task.getEndTime()) && x.getStartTime().equals(task.getStartTime()) || x.getEndTime().equals(task.getEndTime()) && x.getStartTime().isBefore(task.getStartTime()));
     }
 }

@@ -12,19 +12,19 @@ public class Main {
     }
 
     private static void printAllTasks(TaskManager taskManager) {
-        Task task0 = new Task("Сервис транзакций_V1", "Написать сервис для передачи информации по проводкам", TaskStatus.NEW);
-        Task task1 = new Task("Сервис транзакций_V2", "Написать сервис для передачи информации по проводкам", TaskStatus.IN_PROGRESS);
+        Task task0 = new Task("Сервис транзакций_V1", "Написать сервис для передачи информации по проводкам", TaskStatus.NEW, "2024-04-25 13:30", "2024-04-25 14:30");
+        Task task1 = new Task("Сервис транзакций_V2", "Написать сервис для передачи информации по проводкам", TaskStatus.IN_PROGRESS, "2024-04-25 13:30", "2024-04-25 14:30");
 
         Epic epic0 = new Epic("Сервис транзакций_V2", "Написать сервис для передачи информации по проводкам");
 
-        Subtask subtask0 = new Subtask("Сервис транзакций_V10", "Написать сервис для передачи информации по проводкам", TaskStatus.IN_PROGRESS);
-        Subtask subtask1 = new Subtask("Сервис транзакций_V40", "Написать сервис для передачи информации по проводкам", TaskStatus.IN_PROGRESS);
-        epic0.setSubTaskIds(subtask0.getId());
-        epic0.setSubTaskIds(subtask1.getId());
+        Subtask subtask0 = new Subtask("Сервис транзакций_V10", "Написать сервис для передачи информации по проводкам", TaskStatus.IN_PROGRESS, "2024-04-25 13:30", "2024-04-25 14:30");
+        Subtask subtask1 = new Subtask("Сервис транзакций_V40", "Написать сервис для передачи информации по проводкам", TaskStatus.IN_PROGRESS, "2024-04-25 13:30", "2024-04-25 14:30");
+        epic0.setSubTaskInfo(subtask0);
+        epic0.setSubTaskInfo(subtask1);
 
         Epic epic1 = new Epic("Сервис транзакций_V33", "Написать сервис для передачи информации по проводкам");
-        Subtask subtask2 = new Subtask("Сервис транзакций_V59", "Написать сервис для передачи информации по проводкам", TaskStatus.NEW);
-        epic1.setSubTaskIds(subtask2.getId());
+        Subtask subtask2 = new Subtask("Сервис транзакций_V59", "Написать сервис для передачи информации по проводкам", TaskStatus.NEW, "2024-04-25 13:30", "2024-04-25 14:30");
+        epic1.setSubTaskInfo(subtask2);
 
 
         taskManager.addTask(task0);

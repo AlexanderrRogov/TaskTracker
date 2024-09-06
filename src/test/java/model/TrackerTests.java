@@ -21,25 +21,25 @@ class TrackerTests {
     static Subtask subtask0;
     TaskManager taskManager = Managers.getDefault();
     HistoryManager historyManager = Managers.getDefaultHistory();
-    Task task1 = new Task("Сервис транзакций_V2", "Написать сервис для передачи информации по проводкам", TaskStatus.IN_PROGRESS);
+    Task task1 = new Task("Сервис транзакций_V2", "Написать сервис для передачи информации по проводкам", TaskStatus.IN_PROGRESS, "2024-04-25 13:30", "2024-04-25 14:30");
     static Epic epic0 = new Epic("Сервис транзакций_V2", "Написать сервис для передачи информации по проводкам");
-    static Subtask subtask1 = new Subtask("Сервис транзакций_V40", "Написать сервис для передачи информации по проводкам", TaskStatus.IN_PROGRESS);
+    static Subtask subtask1 = new Subtask("Сервис транзакций_V40", "Написать сервис для передачи информации по проводкам", TaskStatus.IN_PROGRESS, "2024-04-25 13:30", "2024-04-25 14:30");
     static Epic epic1 = new Epic("Сервис транзакций_V33", "Написать сервис для передачи информации по проводкам");
-    static Subtask subtask2 = new Subtask("Сервис транзакций_V59", "Написать сервис для передачи информации по проводкам", TaskStatus.NEW);
+    static Subtask subtask2 = new Subtask("Сервис транзакций_V59", "Написать сервис для передачи информации по проводкам", TaskStatus.NEW, "2024-04-25 13:30", "2024-04-25 14:30");
 
         @BeforeAll
         static void update() {
 
-            epic0.setSubTaskIds(subtask1.getId());
-            epic1.setSubTaskIds(subtask2.getId());
+            epic0.setSubTaskInfo(subtask1);
+            epic1.setSubTaskInfo(subtask2);
         }
 
 
     @BeforeEach
     void setup() {
-        task0 = new Task("Сервис транзакций_V1", "Написать сервис для передачи информации по проводкам", TaskStatus.NEW);
-        subtask0 = new Subtask("Сервис транзакций_V10", "Написать сервис для передачи информации по проводкам", TaskStatus.IN_PROGRESS);
-        epic0.setSubTaskIds(subtask0.getId());
+        task0 = new Task("Сервис транзакций_V1", "Написать сервис для передачи информации по проводкам", TaskStatus.NEW, "2024-04-25 13:30", "2024-04-25 14:30");
+        subtask0 = new Subtask("Сервис транзакций_V10", "Написать сервис для передачи информации по проводкам", TaskStatus.IN_PROGRESS, "2024-04-25 13:30", "2024-04-25 14:30");
+        epic0.setSubTaskInfo(subtask0);
     }
 
        @Test
@@ -51,7 +51,7 @@ class TrackerTests {
 
     @Test
     void addNewTask() {
-        Task task0 = new Task("Сервис транзакций_V1_NEW", "Написать сервис для передачи информации по проводкам", TaskStatus.NEW);
+        Task task0 = new Task("Сервис транзакций_V1_NEW", "Написать сервис для передачи информации по проводкам", TaskStatus.NEW, "2024-04-25 13:30", "2024-04-25 13:30");
         taskManager.addTask(task0);
 
         final Task savedTask = taskManager.getTask(task0.getId());

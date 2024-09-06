@@ -1,15 +1,20 @@
 package model;
 
+import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
 public class Subtask extends Task {
 
-    public Subtask(String name, String info, TaskStatus taskStatus) {
-        super(name, info, taskStatus);
+    private TaskType taskType = TaskType.SUBTASK;
+
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+
+    public Subtask(String name, String info, TaskStatus taskStatus, String startTime, String duration) {
+        super(name, info, taskStatus, startTime, duration);
     }
 
     public Subtask(Task task) {
-        super(task.getName(), task.getInfo(), task.getTaskStatus());
+        super(task.getName(), task.getInfo(), task.getTaskStatus(), task.getStartTime(), task.getDuration());
     }
 
     @Override
@@ -32,6 +37,9 @@ public class Subtask extends Task {
                 ", info='" + getInfo() + '\'' +
                 ", id=" + getId() +
                 ", taskStatus=" + getTaskStatus() +
+                ", startTime=" + getStartTime() +
+                ", endTime=" + getEndTime().format(formatter) +
+                ", duration=" + getDuration() +
                 '}';
     }
 
