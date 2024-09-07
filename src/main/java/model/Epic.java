@@ -18,9 +18,7 @@ public class Epic extends Task {
 
     private final ArrayList<Integer> subTaskIds = new ArrayList<>();
 
-    private LocalDateTime startTime = LocalDateTime.MIN;
 
-    private Duration duration = Duration.ZERO;
 
     private LocalDateTime endTime = LocalDateTime.MIN;
 

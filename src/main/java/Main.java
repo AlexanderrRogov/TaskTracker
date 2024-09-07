@@ -6,10 +6,10 @@ import model.TaskStatus;
 import util.Managers;
 
 public class Main {
-    public static void main(String[] args) {
-        TaskManager taskManager = Managers.getDefault();
-        printAllTasks(taskManager);
-    }
+//    public static void main(String[] args) {
+//        TaskManager taskManager = Managers.getDefault();
+//        printAllTasks(taskManager);
+//    }
 
     private static void printAllTasks(TaskManager taskManager) {
         Task task0 = new Task("Сервис транзакций_V1", "Написать сервис для передачи информации по проводкам", TaskStatus.NEW, "2024-04-25 13:30", "2024-04-25 14:30");
