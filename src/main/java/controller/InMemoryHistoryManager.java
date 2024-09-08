@@ -11,8 +11,8 @@ import java.util.Map;
 
 public class InMemoryHistoryManager implements HistoryManager {
 
-    private DoublyLinkedList<Task> doublyLinkedList = new DoublyLinkedList<>();
-    private Map<Integer, Node<Task>> historyMap = new HashMap<>();
+    private final DoublyLinkedList<Task> doublyLinkedList = new DoublyLinkedList<>();
+    private final Map<Integer, Node<Task>> historyMap = new HashMap<>();
 
     @Override
     public void addTask(Task task) {
@@ -23,16 +23,13 @@ public class InMemoryHistoryManager implements HistoryManager {
             doublyLinkedList.insertAtBeginning(task);
             historyMap.put(task.getId(), doublyLinkedList.head);
         } else {
-            if(historyMap.get(task.getId()) == null) {
-                doublyLinkedList.insertAtEnd(task);
-                historyMap.put(task.getId(), doublyLinkedList.tail);
-            } else {
+            if (historyMap.get(task.getId()) != null) {
                 Node<Task> node = historyMap.get(task.getId());
                 removeNode(node);
                 remove(task.getId());
-                doublyLinkedList.insertAtEnd(task);
-                historyMap.put(task.getId(), doublyLinkedList.tail);
             }
+            doublyLinkedList.insertAtEnd(task);
+            historyMap.put(task.getId(), doublyLinkedList.tail);
         }
     }
 
@@ -49,7 +46,7 @@ public class InMemoryHistoryManager implements HistoryManager {
         doublyLinkedList.deleteNode(node);
     }
 
-    public class DoublyLinkedList<T>  {
+    public static class DoublyLinkedList<T>  {
 
         Node<T> head;
         Node<T> tail;

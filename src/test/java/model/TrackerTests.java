@@ -26,8 +26,10 @@ class TrackerTests {
     static Subtask subtask1 = new Subtask("Сервис транзакций_V40", "Написать сервис для передачи информации по проводкам", TaskStatus.IN_PROGRESS, "2024-04-25 13:30", "2024-04-25 14:30");
     static Epic epic1 = new Epic("Сервис транзакций_V33", "Написать сервис для передачи информации по проводкам");
     static Subtask subtask2 = new Subtask("Сервис транзакций_V59", "Написать сервис для передачи информации по проводкам", TaskStatus.NEW, "2024-04-25 13:30", "2024-04-25 14:30");
+    static Subtask subtask3 = new Subtask("Сервис транзакций_V60", "Написать сервис для передачи информации по проводкам", TaskStatus.DONE, "2024-04-25 15:30", "2024-04-25 16:35");
 
-        @BeforeAll
+
+    @BeforeAll
         static void update() {
 
             epic0.setSubTaskInfo(subtask1);
@@ -40,10 +42,11 @@ class TrackerTests {
         task0 = new Task("Сервис транзакций_V1", "Написать сервис для передачи информации по проводкам", TaskStatus.NEW, "2024-04-25 13:30", "2024-04-25 14:30");
         subtask0 = new Subtask("Сервис транзакций_V10", "Написать сервис для передачи информации по проводкам", TaskStatus.IN_PROGRESS, "2024-04-25 13:30", "2024-04-25 14:30");
         epic0.setSubTaskInfo(subtask0);
+        epic0.setSubTaskInfo(subtask2);
     }
 
-       @Test
-       void test() {
+    @Test
+    void test() {
            taskManager.addTask(task0);
            Task testTask = taskManager.getTask(task0.getId());
            assertEquals(task0, testTask);
@@ -82,6 +85,22 @@ class TrackerTests {
         fileBackedTaskManager.addTask(task0);
         fileBackedTaskManager.addEpic(epic0);
         fileBackedTaskManager.addSubtask(subtask1);
+        final HashMap<TaskType, ArrayList<? extends Task>> restoredTasks = FileBackedTaskManager.loadFromFile();
+        assertNotNull(restoredTasks, "Файлы восстановлены");
+    }
+
+    @Test
+    void checkEpicDuration() {
+        FileBackedTaskManager fileBackedTaskManager = Managers.getFileBackedTaskManager();
+        var epic32 = new Epic("Сервис транзакций_V2", "Написать сервис для передачи информации по проводкам");
+        var subtask32 = new Subtask("Сервис транзакций_V10", "Написать сервис для передачи информации по проводкам 1", TaskStatus.IN_PROGRESS, "2024-04-25 13:30", "2024-04-25 14:30");
+        var subtask33 = new Subtask("Сервис транзакций_V11", "Написать сервис для передачи информации по проводкам 2", TaskStatus.DONE, "2024-04-25 15:30", "2024-04-25 16:30");
+        var subtask44 = new Subtask("Сервис транзакций_V12", "Написать сервис для передачи информации по проводкам 3", TaskStatus.IN_PROGRESS, "2024-04-27 18:30", "2024-04-28 19:30");
+        epic32.setSubTaskInfo(subtask32);
+        epic32.setSubTaskInfo(subtask33);
+        epic32.setSubTaskInfo(subtask44);
+        fileBackedTaskManager.addEpic(epic32);
+
         final HashMap<TaskType, ArrayList<? extends Task>> restoredTasks = FileBackedTaskManager.loadFromFile();
         assertNotNull(restoredTasks, "Файлы восстановлены");
     }
