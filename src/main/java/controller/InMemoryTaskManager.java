@@ -7,21 +7,25 @@ import model.Task;
 import util.Managers;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.TreeSet;
 
 public class InMemoryTaskManager implements TaskManager {
 
     protected final HashMap<Integer, Task> tasks = new HashMap<>();
     protected final HashMap<Integer, Epic> epics = new HashMap<>();
     protected final HashMap<Integer, Subtask> subtasks = new HashMap<>();
+    List<Task> intersections = new ArrayList<>();
 
     protected final HistoryManager historyManager = Managers.getDefaultHistory();
-
+    protected TreeSet<Task> prioritizedTasks = new TreeSet<>(Comparator.comparing(Task::getStartTime));
     @Override
     public ArrayList<Task> getTasks() {
         return new ArrayList<>(tasks.values());
     }
+
     @Override
     public ArrayList<Subtask> getSubtasks() {
         return new ArrayList<>(subtasks.values());
@@ -32,14 +36,9 @@ public class InMemoryTaskManager implements TaskManager {
         ArrayList<Subtask> epicSub = new ArrayList<>();
         if(id != 0) {
             if (!epics.get(id).getSubTaskIds().isEmpty()) {
-                for (Subtask subtask : subtasks.values()) {
-
-                    for (Integer i : epics.get(id).getSubTaskIds()) {
-                        if (subtask.getId().equals(i)) {
-                            epicSub.add(subtask);
-                        }
-                    }
-                }
+                subtasks.values().forEach(subtask -> {
+                    epics.get(id).getSubTaskIds().stream().filter(i -> subtask.getId().equals(i)).map(i -> subtask).forEach(epicSub::add);
+                });
             } else {
                 return new ArrayList<>();
             }
@@ -51,21 +50,34 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void addTask(Task task) {
-        tasks.put(task.getId(), task);
+        if (IsIntersect(task)) {
+            tasks.put(task.getId(), task);
+            prioritizedTasks.add(task);
+        } else {
+           intersections.forEach(x->System.out.println("Есть пересечения с" + x.getClass() + " ID " + x.getId()));
+        }
     }
 
     @Override
     public void addSubtask(Subtask subtask) {
-        subtasks.put(subtask.getId(), subtask);
-        for(Epic epic : epics.values()) {
-            if(epic.getSubTaskIds().contains(subtask.getId())) {
+        if(IsIntersect(subtask)) {
+            prioritizedTasks.add(subtask);
+            subtasks.put(subtask.getId(), subtask);
+            epics.values().stream().filter(epic -> epic.getSubTaskIds().contains(subtask.getId())).forEach(epic -> {
                 updateEpicStatus(epic.getId());
-            }
+            });
+        } else {
+            intersections.forEach(x->System.out.println("Есть пересечения с" + x.getClass() + " ID " + x.getId()));
         }
     }
     @Override
     public void addEpic(Epic epic) {
-        epics.put(epic.getId(), epic);
+        if (IsIntersect(epic)) {
+            prioritizedTasks.add(epic);
+            epics.put(epic.getId(), epic);
+        } else {
+            intersections.forEach(x->System.out.println("Есть пересечения с" + x.getClass() + " ID " + x.getId()));
+        }
     }
 
     @Override
@@ -90,13 +102,14 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void deleteTask(Integer id) {
-        tasks.remove(id);
+    public Task deleteTask(Integer id) {
+        prioritizedTasks.remove(tasks.get(id));
+        return tasks.remove(id);
     }
 
     @Override
-    public void deleteSubtask(Integer id) {
-        subtasks.remove(id);
+    public Subtask deleteSubtask(Integer id) {
+        prioritizedTasks.remove(subtasks.get(id));
         for (Epic epic : epics.values()) {
             if (epic.getSubTaskIds().contains(id))
             {
@@ -104,37 +117,87 @@ public class InMemoryTaskManager implements TaskManager {
                 updateEpicStatus(epic.getId());
             }
         }
+        return subtasks.remove(id);
     }
+
     @Override
-    public void deleteEpic(Integer id) {
-        epics.remove(id);
+    public Epic deleteEpic(Integer id) {
+        prioritizedTasks.remove(epics.get(id));
+        return epics.remove(id);
     }
 
     @Override
     public void deleteTasks() {
+        prioritizedTasks.removeAll(tasks.values());
         tasks.clear();
     }
 
     @Override
     public void deleteSubtasks() {
+        prioritizedTasks.removeAll(subtasks.values());
         for (Epic epic : epics.values()) {
             epic.cleanSubtaskIds();
-            updateEpicStatus(0);
+            updateEpicStatus(epic.getId());
         }
         subtasks.clear();
     }
     @Override
     public void deleteEpics() {
+        prioritizedTasks.removeAll(epics.values());
+        prioritizedTasks.removeAll(subtasks.values());
         epics.clear();
         subtasks.clear();
     }
 
     @Override
     public void updateEpicStatus(Integer epicId) {
-        epics.put(epicId, epics.get(epicId).updateEpicStatus(getSubtasksForEpic(epicId)));
+        prioritizedTasks.remove(epics.get(epicId));
+        prioritizedTasks.add(epics.put(epicId, epics.get(epicId).updateEpicStatus(getSubtasksForEpic(epicId))));
     }
 
     public List<Task> getHistory() {
         return historyManager.getHistory();
+    }
+
+    public List<Task> getPrioritizedTasks() {
+      return new ArrayList<>(prioritizedTasks);
+
+    }
+
+    public void updateTask(Task task) {
+        if(IsIntersect(task)) {
+            prioritizedTasks.remove(tasks.get(task.getId()));
+            prioritizedTasks.add(task);
+            tasks.put(task.getId(), task);
+        } else {
+            intersections.forEach(x->System.out.println("Есть пересечения с" + x.getClass() + " ID " + x.getId()));
+        }
+    }
+
+    public void updateSubtask(Subtask subtask) {
+        if(IsIntersect(subtask)) {
+            prioritizedTasks.remove(subtasks.get(subtask.getId()));
+            prioritizedTasks.add(subtask);
+            subtasks.put(subtask.getId(), subtask);
+            epics.values().stream().filter(epic -> epic.getSubTaskIds().contains(subtask.getId())).forEach(epic -> {
+                updateEpicStatus(epic.getId());
+            });
+        } else {
+            intersections.forEach(x->System.out.println("Есть пересечения с" + x.getClass() + " ID " + x.getId()));
+        }
+    }
+
+    public Boolean IsIntersect(Task task) {
+      intersections = getPrioritizedTasks().stream().filter(x ->
+                 x.getStartTime().isAfter(task.getStartTime()) && x.getEndTime().isBefore(task.getEndTime()) && !x.getId().equals(task.getId())
+              || x.getStartTime().equals(task.getStartTime()) && x.getEndTime().equals(task.getEndTime()) && !x.getId().equals(task.getId())
+              || x.getStartTime().isBefore(task.getStartTime()) && x.getEndTime().isAfter(task.getStartTime()) && !x.getId().equals(task.getId())
+              || x.getStartTime().isBefore(task.getStartTime()) && x.getEndTime().isBefore(task.getEndTime())
+                         && x.getEndTime().isAfter(task.getStartTime()) && !x.getId().equals(task.getId())
+              || x.getStartTime().isAfter(task.getStartTime()) && x.getEndTime().isAfter(task.getEndTime())
+                         && x.getStartTime().isBefore(task.getEndTime()) && !x.getId().equals(task.getId())
+              || x.getStartTime().equals(task.getStartTime()) && !x.getId().equals(task.getId())
+              || x.getEndTime().equals(task.getEndTime()) && !x.getId().equals(task.getId())).toList();
+        return intersections.isEmpty();
     }
 }
