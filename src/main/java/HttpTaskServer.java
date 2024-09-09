@@ -1,4 +1,5 @@
 import com.sun.net.httpserver.HttpServer;
+import handlers.InMemoryTaskManagerHandler;
 import handlers.PostsHandler;
 
 import java.io.IOException;
@@ -10,7 +11,7 @@ public class HttpTaskServer {
 
     public static void main(String[] args) throws IOException {
         HttpServer httpServer = HttpServer.create(new InetSocketAddress(PORT), 0);
-        httpServer.createContext("/FileBackedTaskManager", new PostsHandler(posts));
+        httpServer.createContext("/FileBackedTaskManager", new InMemoryTaskManagerHandler(posts));
         httpServer.createContext("/InMemoryHistoryManager", new PostsHandler(posts));
         httpServer.createContext("/InMemoryTaskManager", new PostsHandler(posts));
         httpServer.start(); // запускаем сервер
