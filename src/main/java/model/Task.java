@@ -16,7 +16,7 @@ public class Task {
     private Integer id = ThreadLocalRandom.current().nextInt(1, Integer.MAX_VALUE);
     private TaskStatus taskStatus;
     protected Duration duration;
-    protected LocalDateTime startTime;
+    protected LocalDateTime startTime = LocalDateTime.MAX;
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
 

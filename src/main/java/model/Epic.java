@@ -2,15 +2,17 @@ package model;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 
 public class Epic extends Task {
 
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+
+    private final List<Duration> durationsList = new ArrayList<>();
 
     private final TaskType taskType = TaskType.EPIC;
 
@@ -19,30 +21,24 @@ public class Epic extends Task {
     private final ArrayList<Integer> subTaskIds = new ArrayList<>();
 
 
-
-    private LocalDateTime endTime = LocalDateTime.MIN;
+    private LocalDateTime endTime;
 
     public void setSubTaskInfo(Subtask subtask) {
         this.subTaskIds.add(subtask.getId());
         this.startTime = getSubtaskStartTime(subtask.getStartTime());
-        this.endTime = getSubtaskEndTime(subtask.getEndTime());
-        this.duration = Duration.between(this.startTime, endTime) ;
+        this.duration = calculateDuration(subtask.getDuration());
+        this.endTime = getEndTime();
     }
 
-    @Override
-    public Duration getDuration() {
-        return duration;
+    public Duration calculateDuration(Duration duration) {
+        durationsList.add(duration);
+        var durationsSum=  durationsList.stream().reduce(Duration::plus);
+        return durationsSum.get();
     }
 
-    private LocalDateTime getSubtaskEndTime(LocalDateTime subtaskEndTime) {
-        if(this.endTime.isBefore(subtaskEndTime)) {
-            this.endTime = subtaskEndTime;
-        }
-        return this.endTime;
-    }
 
     private LocalDateTime getSubtaskStartTime(LocalDateTime subtaskLocalDateTime){
-        if(this.startTime.isBefore(subtaskLocalDateTime)) {
+        if(this.startTime.isAfter(subtaskLocalDateTime)) {
            this.startTime = subtaskLocalDateTime;
         }
         return this.startTime;
@@ -56,11 +52,7 @@ public class Epic extends Task {
         subTaskIds.clear();
     }
 
-    @Override
-    public LocalDateTime getEndTime() {
-        var endTime=  startTime.toInstant(ZoneOffset.UTC).plus(duration);
-        return LocalDateTime.ofInstant(endTime, ZoneOffset.UTC);
-    }
+
 
     @Override
     public String toString() {

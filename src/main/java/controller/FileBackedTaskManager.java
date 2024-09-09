@@ -40,13 +40,13 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         ArrayList<String[]> tempArr = Arrays.stream(task.toString().split(",")).map(t -> t.split("=")).collect(Collectors.toCollection(ArrayList::new));
         ArrayList<String> formatArr = new ArrayList<>();
         formatArr.add(type);
-        tempArr.stream().map(x -> x[1].replace("\'", "").replace("}", "")).forEach(formatArr::add);
+        tempArr.stream().map(x -> x[1].replace("'", "").replace("}", "")).forEach(formatArr::add);
         return formatArr;
     }
 
     public void save(Task task) {
-        File f = new File("src/main/resources/Storage/TaskStorage.csv");
-        if (f.exists() && !f.isDirectory()) {
+        File file = new File("src/main/resources/Storage/TaskStorage.csv");
+        if (file.exists() && !file.isDirectory()) {
             writeToStorage(task);
         } else {
             Path source = Paths.get("src/main/resources");
@@ -160,44 +160,49 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     @Override
     public void addEpic(Epic epic) {
-        epics.put(epic.getId(), epic);
+        super.addEpic(epic);
         save(epic);
     }
 
     @Override
     public void addTask(Task task) {
-        tasks.put(task.getId(), task);
+        super.addTask(task);
         save(task);
     }
 
     @Override
-    public void deleteTask(Integer id) {
-        Task deletedTask = tasks.remove(id);
-        save(deletedTask);
+    public Task deleteTask(Integer id) {
+        save(super.deleteTask(id));
+        return null;
     }
 
     @Override
-    public void deleteSubtask(Integer id) {
-        var deletedSubTask = subtasks.remove(id);
-        save(deletedSubTask);
-        for (Epic epic : epics.values()) {
-            if (epic.getSubTaskIds().contains(id))
-            {
-                epic.getSubTaskIds().remove(id);
-                updateEpicStatus(epic.getId());
-            }
-        }
+    public Subtask deleteSubtask(Integer id) {
+        save(super.deleteSubtask(id));
+        return null;
     }
+
     @Override
-    public void deleteEpic(Integer id) {
-       var deletedEpic = epics.remove(id);
-       save(deletedEpic);
+    public Epic deleteEpic(Integer id) {
+       save(super.deleteEpic(id));
+       return null;
     }
 
     @Override
     public void updateEpicStatus(Integer epicId) {
         epics.put(epicId, epics.get(epicId).updateEpicStatus(getSubtasksForEpic(epicId)));
         save(epics.get(epicId));
+    }
+
+    @Override
+    public void updateTask(Task task) {
+        super.updateTask(task);
+        save(task);
+    }
+
+    public void updateSubtask(Subtask subtask) {
+        super.updateSubtask(subtask);
+        save(subtask);
     }
 
     @Override

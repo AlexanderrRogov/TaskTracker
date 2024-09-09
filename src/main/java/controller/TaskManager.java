@@ -28,11 +28,11 @@ public interface TaskManager {
 
     Epic getEpic(int id);
 
-    void deleteTask(Integer id);
+    Task deleteTask(Integer id);
 
-    void deleteSubtask(Integer id);
+    Subtask deleteSubtask(Integer id);
 
-    void deleteEpic(Integer id);
+    Epic deleteEpic(Integer id);
 
     void deleteTasks();
 
