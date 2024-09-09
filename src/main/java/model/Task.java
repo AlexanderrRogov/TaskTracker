@@ -118,5 +118,17 @@ public class Task {
         this.info = info;
     }
 
-
+    public Task(Task task) {
+        this.name = task.getName();
+        this.info = task.getInfo();
+        this.taskStatus = task.getTaskStatus();
+        this.startTime = task.getStartTime();
+        this.duration = task.getDuration();
+        if(task.getId() != null) {
+            this.id = task.getId();
+        }
+        if(task.getType() != null) {
+            this.type = task.getType();
+        }
+    }
 }

@@ -8,15 +8,6 @@ import java.io.IOException;
 public class PrioritizedHandler extends BaseHttpHandler implements HttpHandler {
 
     public void handle(HttpExchange exchange) throws IOException {
-        BaseHttpHandler.Endpoint endpoint = getEndpoint(exchange.getRequestURI().getPath(), exchange.getRequestMethod());
-
-        switch (endpoint) {
-            case GET_PRIORITIZED: {
-                //handlePostComments(exchange);
-                break;
-            }
-            default:
-                writeResponse(exchange, "Такого эндпоинта не существует", 404);
-        }
+        writeGetListResponse(exchange, fileBackedTaskManager.getPrioritizedTasks(), 200);
     }
 }

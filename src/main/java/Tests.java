@@ -24,11 +24,11 @@ public class Tests {
 
         taskManager.addTask(task0);
         taskManager.addTask(task1);
-        taskManager.addEpic(epic0);
-        taskManager.addEpic(epic1);
-        taskManager.addSubtask(subtask0);
-        taskManager.addSubtask(subtask1);
-        taskManager.addSubtask(subtask2);
+        taskManager.createEpic(epic0);
+        taskManager.createEpic(epic1);
+        taskManager.createSubtask(subtask0);
+        taskManager.createEpic(subtask1);
+        taskManager.createSubtask(subtask2);
 
 
         System.out.println("Задачи:");

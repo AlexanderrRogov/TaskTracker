@@ -59,25 +59,45 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void addSubtask(Subtask subtask) {
+    public Task createTask(Task task) {
+        if (IsIntersect(task)) {
+            var taskWithId = new Task(task);
+            tasks.put(taskWithId.getId(), taskWithId);
+            prioritizedTasks.add(task);
+            return taskWithId;
+        } else {
+            intersections.forEach(x->System.out.println("Есть пересечения с" + x.getClass() + " ID " + x.getId()));
+        }
+        return null;
+    }
+
+    @Override
+    public Subtask createSubtask(Task subtask) {
         if(IsIntersect(subtask)) {
-            prioritizedTasks.add(subtask);
-            subtasks.put(subtask.getId(), subtask);
-            epics.values().stream().filter(epic -> epic.getSubTaskIds().contains(subtask.getId())).forEach(epic -> {
+            var subtaskWithId = new Subtask(subtask);
+            prioritizedTasks.add(subtaskWithId);
+            subtasks.put(subtaskWithId.getId(), subtaskWithId);
+            epics.values().stream().filter(epic -> epic.getSubTaskIds().contains(subtaskWithId.getId())).forEach(epic -> {
                 updateEpicStatus(epic.getId());
             });
+            return subtaskWithId;
         } else {
             intersections.forEach(x->System.out.println("Есть пересечения с" + x.getClass() + " ID " + x.getId()));
         }
+        return null;
     }
+
     @Override
-    public void addEpic(Epic epic) {
+    public Epic createEpic(Task epic) {
         if (IsIntersect(epic)) {
+            var epicWithId = new Epic(epic);
             prioritizedTasks.add(epic);
-            epics.put(epic.getId(), epic);
+            epics.put(epic.getId(), epicWithId);
+            return epicWithId;
         } else {
             intersections.forEach(x->System.out.println("Есть пересечения с" + x.getClass() + " ID " + x.getId()));
         }
+        return null;
     }
 
     @Override
@@ -164,14 +184,16 @@ public class InMemoryTaskManager implements TaskManager {
 
     }
 
-    public void updateTask(Task task) {
+    public Task updateTask(Task task) {
         if(IsIntersect(task)) {
             prioritizedTasks.remove(tasks.get(task.getId()));
             prioritizedTasks.add(task);
             tasks.put(task.getId(), task);
+            return task;
         } else {
             intersections.forEach(x->System.out.println("Есть пересечения с" + x.getClass() + " ID " + x.getId()));
         }
+        return null;
     }
 
     public void updateSubtask(Subtask subtask) {

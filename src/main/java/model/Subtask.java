@@ -5,7 +5,7 @@ import java.util.Objects;
 
 public class Subtask extends Task {
 
-    private TaskType taskType = TaskType.SUBTASK;
+    private final TaskType taskType = TaskType.SUBTASK;
 
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 

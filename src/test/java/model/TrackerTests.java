@@ -83,8 +83,8 @@ class TrackerTests {
     void saveToFile() {
         FileBackedTaskManager fileBackedTaskManager = Managers.getFileBackedTaskManager();
         fileBackedTaskManager.addTask(task0);
-        fileBackedTaskManager.addEpic(epic0);
-        fileBackedTaskManager.addSubtask(subtask1);
+        fileBackedTaskManager.createEpic(epic0);
+        fileBackedTaskManager.createSubtask(subtask1);
         final HashMap<TaskType, ArrayList<? extends Task>> restoredTasks = FileBackedTaskManager.loadFromFile();
         assertNotNull(restoredTasks, "Файлы восстановлены");
     }
@@ -99,7 +99,7 @@ class TrackerTests {
         epic32.setSubTaskInfo(subtask32);
         epic32.setSubTaskInfo(subtask33);
         epic32.setSubTaskInfo(subtask44);
-        fileBackedTaskManager.addEpic(epic32);
+        fileBackedTaskManager.createEpic(epic32);
 
         final HashMap<TaskType, ArrayList<? extends Task>> restoredTasks = FileBackedTaskManager.loadFromFile();
         assertNotNull(restoredTasks, "Файлы восстановлены");

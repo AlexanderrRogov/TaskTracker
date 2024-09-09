@@ -153,21 +153,23 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     @Override
-    public void addSubtask(Subtask subtask) {
-        super.addSubtask(subtask);
-        save(subtask);
-    }
-
-    @Override
-    public void addEpic(Epic epic) {
-        super.addEpic(epic);
-        save(epic);
-    }
-
-    @Override
     public void addTask(Task task) {
         super.addTask(task);
         save(task);
+    }
+
+    @Override
+    public Task createTask(Task task) {
+        var newTask = super.createTask(task);
+        save(newTask);
+        return newTask;
+    }
+
+    @Override
+    public Subtask createSubtask(Task task) {
+        var newSubtask = super.createSubtask(task);
+        save(newSubtask);
+        return newSubtask;
     }
 
     @Override
@@ -195,9 +197,10 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     @Override
-    public void updateTask(Task task) {
-        super.updateTask(task);
+    public Task updateTask(Task task) {
+        var updatedTask = super.updateTask(task);
         save(task);
+        return updatedTask;
     }
 
     public void updateSubtask(Subtask subtask) {
@@ -217,10 +220,14 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     @Override
     public Task getTask(int id) {
         var task = tasks.get(id);
-        historyManager.addTask(task);
-        save(task);
+        if(task != null) {
+            historyManager.addTask(task);
+            save(task);
+            return task;
+        }
         return task;
     }
+
     @Override
     public Subtask getSubtask(int id) {
         var subtask = subtasks.get(id);
