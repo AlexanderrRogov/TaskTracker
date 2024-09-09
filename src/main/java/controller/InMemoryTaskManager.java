@@ -61,10 +61,10 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Task createTask(Task task) {
         if (IsIntersect(task)) {
-            var taskWithId = new Task(task);
-            tasks.put(taskWithId.getId(), taskWithId);
+            //var taskWithId = new Task(task);
+            tasks.put(task.getId(), task);
             prioritizedTasks.add(task);
-            return taskWithId;
+            return task;
         } else {
             intersections.forEach(x->System.out.println("Есть пересечения с" + x.getClass() + " ID " + x.getId()));
         }
@@ -72,11 +72,11 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Subtask createSubtask(Task subtask) {
-        if(IsIntersect(subtask)) {
-            var subtaskWithId = new Subtask(subtask);
+    public Subtask createSubtask(Task task) {
+        if(IsIntersect(task)) {
+            var subtaskWithId = new Subtask(task);
             prioritizedTasks.add(subtaskWithId);
-            subtasks.put(subtaskWithId.getId(), subtaskWithId);
+            subtasks.put(task.getId(), subtaskWithId);
             epics.values().stream().filter(epic -> epic.getSubTaskIds().contains(subtaskWithId.getId())).forEach(epic -> {
                 updateEpicStatus(epic.getId());
             });
