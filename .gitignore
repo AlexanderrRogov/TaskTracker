@@ -1,4 +1,4 @@
-target
-.idea
-src/main/resources/Storage
-target/classes/org/home
+.classpath
+.project
+.settings/
+target/
