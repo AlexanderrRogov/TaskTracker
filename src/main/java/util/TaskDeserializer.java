@@ -7,7 +7,6 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import model.Task;
 import model.TaskStatus;
-import model.TaskType;
 
 import java.lang.reflect.Type;
 
@@ -22,8 +21,6 @@ public class TaskDeserializer implements JsonDeserializer<Task> {
         TaskStatus taskStatus = TaskStatus.valueOf(jObject.get("taskStatus").getAsString());
         String startTime = jObject.get("startTime").getAsString();
         String duration = jObject.get("duration").getAsString();
-        return new Task(name, info, taskStatus, startTime, duration );
+        return new Task(name, info, taskStatus, startTime, duration);
     }
-
-
 }

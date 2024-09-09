@@ -21,6 +21,7 @@ public class Managers {
     }
 
     private static final Gson gson  =  new GsonBuilder().registerTypeAdapter(Task.class, new TaskDeserializer())
+            .registerTypeAdapter(Task.class, new TaskSerializer())
             .setPrettyPrinting().create();
 
     public static Gson getGson() {

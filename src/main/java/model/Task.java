@@ -10,7 +10,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 
 public class Task {
-    private String type;
+    private String type = TaskType.TASK.name();
     private String name;
     private String info;
     private Integer id = ThreadLocalRandom.current().nextInt(1, Integer.MAX_VALUE);
@@ -18,7 +18,6 @@ public class Task {
     protected Duration duration;
     protected LocalDateTime startTime = LocalDateTime.MAX;
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-
 
     @Override
     public String toString() {
