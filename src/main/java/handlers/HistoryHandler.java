@@ -1,15 +1,24 @@
 package handlers;
 
 import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
+import controller.TaskManager;
+import model.Task;
+import util.Managers;
 
 import java.io.IOException;
+import java.util.List;
 
-public class HistoryHandler extends BaseHttpHandler implements HttpHandler {
+public class HistoryHandler extends BaseHttpHandler {
+
+    public HistoryHandler(TaskManager taskManager) {
+        super(taskManager);
+    }
 
     @Override
-    public void handle(HttpExchange exchange) throws IOException {
-        super.handle(exchange);
+    protected void processGetList(HttpExchange exchange) throws IOException {
+        List<Task> history = taskManager.getHistory();
+        String data = Managers.getGson().toJson(history);
+        sendText(exchange, data);
     }
 }
 

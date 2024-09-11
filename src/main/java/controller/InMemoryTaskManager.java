@@ -50,30 +50,29 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void addTask(Task task) {
-        if (IsIntersect(task)) {
+        if (hasIntersection(task)) {
             tasks.put(task.getId(), task);
             prioritizedTasks.add(task);
         } else {
-           intersections.forEach(x->System.out.println("Есть пересечения с" + x.getClass() + " ID " + x.getId()));
+           intersections.forEach(x->System.out.println("Есть пересечения по времени с " + x.getClass() + " ID " + x.getId()));
         }
     }
 
     @Override
     public Task createTask(Task task) {
-        if (IsIntersect(task)) {
-            //var taskWithId = new Task(task);
+        if (hasIntersection(task)) {
             tasks.put(task.getId(), task);
             prioritizedTasks.add(task);
             return task;
         } else {
-            intersections.forEach(x->System.out.println("Есть пересечения с" + x.getClass() + " ID " + x.getId()));
+            intersections.forEach(x->System.out.println("Есть пересечения по времени с " + x.getClass() + " ID " + x.getId()));
         }
         return null;
     }
 
     @Override
     public Subtask createSubtask(Task task) {
-        if(IsIntersect(task)) {
+        if(hasIntersection(task)) {
             var subtaskWithId = new Subtask(task);
             prioritizedTasks.add(subtaskWithId);
             subtasks.put(task.getId(), subtaskWithId);
@@ -82,20 +81,20 @@ public class InMemoryTaskManager implements TaskManager {
             });
             return subtaskWithId;
         } else {
-            intersections.forEach(x->System.out.println("Есть пересечения с" + x.getClass() + " ID " + x.getId()));
+            intersections.forEach(x->System.out.println("Есть пересечения по времени с " + x.getClass() + " ID " + x.getId()));
         }
         return null;
     }
 
     @Override
     public Epic createEpic(Task epic) {
-        if (IsIntersect(epic)) {
+        if (hasIntersection(epic)) {
             var epicWithId = new Epic(epic);
             prioritizedTasks.add(epic);
             epics.put(epic.getId(), epicWithId);
             return epicWithId;
         } else {
-            intersections.forEach(x->System.out.println("Есть пересечения с" + x.getClass() + " ID " + x.getId()));
+            intersections.forEach(x->System.out.println("Есть пересечения по времени с " + x.getClass() + " ID " + x.getId()));
         }
         return null;
     }
@@ -185,31 +184,31 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     public Task updateTask(Task task) {
-        if(IsIntersect(task)) {
+        if(hasIntersection(task)) {
             prioritizedTasks.remove(tasks.get(task.getId()));
             prioritizedTasks.add(task);
             tasks.put(task.getId(), task);
             return task;
         } else {
-            intersections.forEach(x->System.out.println("Есть пересечения с" + x.getClass() + " ID " + x.getId()));
+            intersections.forEach(x->System.out.println("Есть пересечения по времени с " + x.getClass() + " ID " + x.getId()));
         }
         return null;
     }
 
-    public void updateSubtask(Subtask subtask) {
-        if(IsIntersect(subtask)) {
+    public void updateSubtask(Task subtask) {
+        if(hasIntersection(subtask)) {
             prioritizedTasks.remove(subtasks.get(subtask.getId()));
             prioritizedTasks.add(subtask);
-            subtasks.put(subtask.getId(), subtask);
+            subtasks.put(subtask.getId(), (Subtask) subtask);
             epics.values().stream().filter(epic -> epic.getSubTaskIds().contains(subtask.getId())).forEach(epic -> {
                 updateEpicStatus(epic.getId());
             });
         } else {
-            intersections.forEach(x->System.out.println("Есть пересечения с" + x.getClass() + " ID " + x.getId()));
+            intersections.forEach(x->System.out.println("Есть пересечения по времени с " + x.getClass() + " ID " + x.getId()));
         }
     }
 
-    public Boolean IsIntersect(Task task) {
+    public boolean hasIntersection(Task task) {
       intersections = getPrioritizedTasks().stream().filter(x ->
                  x.getStartTime().isAfter(task.getStartTime()) && x.getEndTime().isBefore(task.getEndTime()) && !x.getId().equals(task.getId())
               || x.getStartTime().equals(task.getStartTime()) && x.getEndTime().equals(task.getEndTime()) && !x.getId().equals(task.getId())

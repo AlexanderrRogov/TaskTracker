@@ -203,7 +203,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         return updatedTask;
     }
 
-    public void updateSubtask(Subtask subtask) {
+    public void updateSubtask(Task subtask) {
         super.updateSubtask(subtask);
         save(subtask);
     }
@@ -241,5 +241,10 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         historyManager.addTask(epic);
         save(epic);
         return epic;
+    }
+
+    @Override
+    public boolean hasIntersection(Task task) {
+       return super.hasIntersection(task);
     }
 }

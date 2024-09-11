@@ -14,7 +14,7 @@ public class Subtask extends Task {
     }
 
     public Subtask(Task task) {
-        super(task.getName(), task.getInfo(), task.getTaskStatus(), task.getStartTime(), task.getDuration());
+        super(task);
     }
 
     @Override
@@ -43,4 +43,7 @@ public class Subtask extends Task {
                 '}';
     }
 
+    public TaskType getTaskType() {
+        return taskType;
+    }
 }

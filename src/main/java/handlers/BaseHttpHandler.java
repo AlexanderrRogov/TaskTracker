@@ -3,240 +3,162 @@ package handlers;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
-import controller.FileBackedTaskManager;
-import model.Epic;
+import controller.TaskManager;
 import model.Task;
-
 import util.Managers;
-
-
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
+
 
 public class BaseHttpHandler implements HttpHandler {
 
+    TaskManager taskManager;
+
+    public BaseHttpHandler(TaskManager taskManager) {
+        this.taskManager = taskManager;
+    }
+
     public void handle(HttpExchange exchange) throws IOException {
-        BaseHttpHandler.Endpoint endpoint = getEndpoint(exchange.getRequestURI().getPath(), exchange.getRequestMethod());
-
+        Endpoint endpoint = getEndpoint(exchange);
         switch (endpoint) {
-            case GET_EPICS: {
-                handleGetEpics(exchange);
+            case GET_ONE:
+                processGetById(exchange);
                 break;
-            }
-            case GET_EPIC: {
-                handleGetEpic(exchange);
+
+            case GET_LIST:
+                processGetList(exchange);
                 break;
-            }
-            case POST_EPIC: {
-                handlePostEpic(exchange);
+
+            case CREATE:
+                processCreate(exchange);
                 break;
-            }
-            case DELETE_EPIC: {
-                handleDeleteEpic(exchange);
+
+            case UPDATE:
+                processUpdate(exchange);
                 break;
-            }
-            case GET_EPIC_SUBTASKS: {
-                handleGetEpicSubtasks(exchange);
+
+            case DELETE:
+                processDelete(exchange);
                 break;
-            }
-            case GET_SUBTASKS: {
-                handleGetSubtasks(exchange);
+            case GET_SUBTASKS_OF_EPIC:
+                processGetSubtasksOfEpic(exchange);
                 break;
-            }
-            case GET_SUBTASK: {
-                handleGetSubtask(exchange);
-                break;
-            }
-            case POST_SUBTASK: {
-                handlePostSubtask(exchange);
-                break;
-            }
-            case DELETE_SUBTASK: {
-                handleDeleteSubtask(exchange);
-                break;
-            }
-            case GET_TASKS: {
-                handleGetTasks(exchange);
-                break;
-            }
-            case GET_TASK: {
-                handleGetTask(exchange);
-                break;
-            }
-            case POST_TASK: {
-                handlePostTask(exchange);
-                break;
-            }
-            case DELETE_TASK: {
-                handleDeleteTask(exchange);
-                break;
-            }
-            case GET_PRIORITIZED: {
-                handlePrioritized(exchange);
-                break;
-            }
-            case GET_HISTORY: {
-                handleHistory(exchange);
-                break;
-            }
             default:
-                writeResponse(exchange, "Такого эндпоинта не существует", 404);
+                sendNotFound(exchange);
         }
     }
 
-    public void handlePrioritized(HttpExchange exchange) throws IOException {
-        writeGetListResponse(exchange, fileBackedTaskManager.getPrioritizedTasks(), 200);
-    }
+    protected Endpoint getEndpoint(HttpExchange exchange) throws IOException {
+        String requestPath = exchange.getRequestURI().getPath();
+        String requestMethod = exchange.getRequestMethod();
 
-    public void handleHistory(HttpExchange exchange) throws IOException {
-        writeGetListResponse(exchange, fileBackedTaskManager.getHistory(), 200);
-    }
-
-    public void handleGetTasks(HttpExchange exchange) throws IOException {
-        ArrayList<Task> tasks = fileBackedTaskManager.getTasks();
-        if(tasks.isEmpty()) {
-            writeResponse(exchange, "История тасков пуста. Добавьте таск", 404);
-        } else {
-            writeGetListResponse(exchange, tasks, 200);
-        }
-
-    }
-
-    public void handleGetTask(HttpExchange exchange) throws IOException {
-        try {
-            var taskId = getTaskId(exchange);
-            var task = fileBackedTaskManager.getTask(taskId);
-            if (task != null) {
-                var str = Managers.getGson().toJson(task, Task.class);
-                writeResponse(exchange, str, 200);
-            } else {
-                writeResponse(exchange, "Таск с идентификатором " + taskId + " не найден", 404);
+        switch (requestMethod) {
+            case "DELETE" -> {
+                return Endpoint.DELETE;
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+            case "GET" -> {
+                String[] requestPathParts = requestPath.split("/");
+
+                if (requestPathParts.length == 3) {
+                    return Endpoint.GET_ONE;
+                }
+                if (requestPathParts.length == 4) {
+                    return Endpoint.GET_SUBTASKS_OF_EPIC;
+                }
+                return Endpoint.GET_LIST;
+            }
+            case "POST" -> {
+                String requestBody = new String(exchange.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
+                if (requestBody.isEmpty()) {
+                    return Endpoint.UNKNOWN;
+                }
+
+                Integer id = getTaskId(exchange);
+                if (id == null) {
+                    return Endpoint.CREATE;
+                }
+
+                return Endpoint.UPDATE;
+            }
         }
+
+        return Endpoint.UNKNOWN;
     }
 
-    public void handlePostTask(HttpExchange exchange) throws IOException {
-        var taskId = getTaskId(exchange);
-        if(taskId == null) {
-            var task = fileBackedTaskManager.createTask(getTaskFromPost(exchange));
-            writeResponse(exchange, "Новый таск создан, ID " + task.getId(), 201);
-        } else {
-            var updatedTask = fileBackedTaskManager.updateTask(getTaskFromPost(exchange));
-            writeResponse(exchange, "Таск обновлён, ID " + updatedTask.getId(), 201);
-        }
+   public void processGetSubtasksOfEpic(HttpExchange h) throws IOException {
+       sendMethodNotAllowed(h);
+   }
+
+    protected void processGetById(HttpExchange h) throws IOException {
+        sendMethodNotAllowed(h);
     }
 
-    public void handleDeleteTask(HttpExchange exchange) throws IOException {
-        var taskId = getTaskId(exchange);
-        var task = fileBackedTaskManager.deleteTask(taskId);
-        writeResponse(exchange, "Таск удалён, ID " + task.getId(), 200);
+    protected void processGetList(HttpExchange h) throws IOException {
+        sendMethodNotAllowed(h);
     }
 
-    public void handleGetSubtasks(HttpExchange exchange) throws IOException {
-        var tasks = fileBackedTaskManager.getSubtasks();
-        writeGetListResponse(exchange, tasks, 200);
-    }
-
-    public void handleGetSubtask(HttpExchange exchange) throws IOException {
-        var taskId = getTaskId(exchange);
-        var task = fileBackedTaskManager.getSubtask(taskId);
-        if(task != null) {
-            var str = Managers.getGson().toJson(task, Task.class);
-            writeResponse(exchange, str, 200);
-        } else {
-            writeResponse(exchange, "Cабтаск с идентификатором " + taskId + " не найден", 404);
-        }
-    }
-
-    public void handlePostSubtask(HttpExchange exchange) throws IOException {
-        var taskId = getTaskId(exchange);
-        if(taskId == null) {
-            var task = fileBackedTaskManager.createSubtask(getTaskFromPost(exchange));
-            writeResponse(exchange, "Новый таск создан, ID " + task.getId(), 201);
-        } else {
-            var updatedTask = fileBackedTaskManager.updateTask(getTaskFromPost(exchange));
-            writeResponse(exchange, "Таск обновлён, ID " + updatedTask.getId(), 201);
-        }
-    }
-
-    public void handleDeleteSubtask(HttpExchange exchange) throws IOException {
-        var taskId = getTaskId(exchange);
-        var task = fileBackedTaskManager.deleteSubtask(taskId);
-        writeResponse(exchange, "Cабтаск удалён, ID " + task.getId(), 200);
-    }
-
-    public void handleGetEpics(HttpExchange exchange) throws IOException {
-        var tasks = fileBackedTaskManager.getEpics();
-        writeGetListResponse(exchange, tasks, 200);
-    }
-
-    public void handleGetEpic(HttpExchange exchange) throws IOException {
-        var taskId = getTaskId(exchange);
-        var task = fileBackedTaskManager.getEpic(taskId);
-        if(task != null) {
-            var str = Managers.getGson().toJson(task, Epic.class);
-            writeResponse(exchange, str, 200);
-        } else {
-            writeResponse(exchange, "Эпик с идентификатором " + taskId + " не найден", 404);
-        }
-    }
-
-    public void handlePostEpic(HttpExchange exchange) throws IOException {
-        var taskId = getTaskId(exchange);
-        if(taskId == null) {
-            var task = fileBackedTaskManager.createEpic(getTaskFromPost(exchange));
-            writeResponse(exchange, "Новый эпик создан, ID " + task.getId(), 201);
-        } else {
-            writeResponse(exchange, "Эпик не найден ID" + taskId, 201);
-        }
-    }
-
-    public void handleDeleteEpic(HttpExchange exchange) throws IOException {
-        var taskId = getTaskId(exchange);
-        var task = fileBackedTaskManager.deleteEpic(taskId);
-        writeResponse(exchange, "Эпик удалён, ID " + task.getId(), 200);
-    }
-
-    public void handleGetEpicSubtasks(HttpExchange exchange) throws IOException {
-        var taskId = getTaskId(exchange);
-        var tasks = fileBackedTaskManager.getSubtasksForEpic(taskId);
-        writeGetListResponse(exchange, tasks, 200);
-    }
-
-    private static final Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
-
-    protected FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager();
-
-    public void writeResponse(HttpExchange exchange,
-                              String responseString,
-                              int responseCode) throws IOException {
-        try (OutputStream os = exchange.getResponseBody()) {
-            exchange.getResponseHeaders().add("Content-Type", "application/json;charset=utf-8");
-            exchange.sendResponseHeaders(responseCode, 0);
-            os.write(responseString.getBytes(DEFAULT_CHARSET));
-        }
-        exchange.close();
+    protected void processCreate(HttpExchange h) throws IOException {
+        sendMethodNotAllowed(h);
     }
 
 
-    public void writeGetListResponse(HttpExchange exchange,
-                                     List<? extends Task> responseString,
-                                     int responseCode) throws IOException {
-        try (OutputStream os = exchange.getResponseBody()) {
-            exchange.getResponseHeaders().add("Content-Type", "application/json;charset=utf-8");
-            exchange.sendResponseHeaders(responseCode, 0);
-            os.write(Managers.getGson().toJson(responseString.toString()).getBytes(DEFAULT_CHARSET));
-        }
-        exchange.close();
+    protected void processDelete(HttpExchange h) throws IOException {
+        sendMethodNotAllowed(h);
     }
 
+    protected void processUpdate(HttpExchange h) throws IOException {
+        sendMethodNotAllowed(h);
+    }
+
+    protected void sendText(HttpExchange h, String text) throws IOException {
+        byte[] resp = text.getBytes(StandardCharsets.UTF_8);
+        h.getResponseHeaders().add("Content-Type", "application/json;charset=utf-8");
+        h.sendResponseHeaders(200, resp.length);
+        h.getResponseBody().write(resp);
+        h.close();
+    }
+
+    protected void sendModify(HttpExchange h) throws IOException {
+        h.getResponseHeaders().add("Content-Type", "application/json;charset=utf-8");
+        h.sendResponseHeaders(201, 0);
+        h.close();
+    }
+
+    public void sendNotFound(HttpExchange h) throws IOException {
+        byte[] resp = "Not Found".getBytes(StandardCharsets.UTF_8);
+        h.getResponseHeaders().add("Content-Type", "application/json;charset=utf-8");
+        h.sendResponseHeaders(404, resp.length);
+        h.getResponseBody().write(resp);
+        h.close();
+    }
+
+    public void sendHasInteractions(HttpExchange h) throws IOException {
+        byte[] resp = "Not Acceptable".getBytes(StandardCharsets.UTF_8);
+        h.getResponseHeaders().add("Content-Type", "application/json;charset=utf-8");
+        h.sendResponseHeaders(406, resp.length);
+        h.getResponseBody().write(resp);
+        h.close();
+    }
+
+    public void sendInternalServerError(HttpExchange h, Exception e) throws IOException {
+        String message = "Internal Server Error:" + e.getMessage();
+        byte[] resp = message.getBytes(StandardCharsets.UTF_8);
+        h.getResponseHeaders().add("Content-Type", "application/json;charset=utf-8");
+        h.sendResponseHeaders(500, resp.length);
+        h.getResponseBody().write(resp);
+        h.close();
+    }
+
+    public void sendMethodNotAllowed(HttpExchange h) throws IOException {
+        String message = "Method Not Allowed";
+        byte[] resp = message.getBytes(StandardCharsets.UTF_8);
+        h.getResponseHeaders().add("Content-Type", "application/json;charset=utf-8");
+        h.sendResponseHeaders(405, resp.length);
+        h.getResponseBody().write(resp);
+        h.close();
+    }
 
     public Integer getTaskId(HttpExchange exchange) {
         var path = exchange.getRequestURI().getPath();
@@ -256,63 +178,5 @@ public class BaseHttpHandler implements HttpHandler {
 
     }
 
-    enum Endpoint {
-        POST_TASK, GET_TASKS, GET_TASK, UNKNOWN, DELETE_TASK, GET_SUBTASK, GET_SUBTASKS,
-        POST_SUBTASK, DELETE_SUBTASK, GET_EPICS, GET_EPIC, POST_EPIC, DELETE_EPIC,
-        GET_EPIC_SUBTASKS, GET_HISTORY, GET_PRIORITIZED
-    }
-
-    public Endpoint getEndpoint(String requestPath, String requestMethod) {
-        String[] pathParts = requestPath.split("/");
-
-        if (requestMethod.equals("GET") && pathParts[1].equals("tasks") && pathParts[2].isEmpty()) {
-            return Endpoint.GET_TASKS;
-        }
-        if (requestMethod.equals("GET") && pathParts[1].equals("tasks")) {
-            return Endpoint.GET_TASK;
-        }
-        if (requestMethod.equals("POST") && pathParts[1].equals("tasks")) {
-            return Endpoint.POST_TASK;
-        }
-        if (requestMethod.equals("DELETE") && pathParts[1].equals("task")) {
-            return Endpoint.DELETE_TASK;
-        }
-
-        if (requestMethod.equals("GET") && pathParts[1].equals("subtasks")) {
-            return Endpoint.GET_SUBTASKS;
-        }
-        if (requestMethod.equals("GET") && pathParts[1].equals("subtask")) {
-            return Endpoint.GET_SUBTASK;
-        }
-        if (requestMethod.equals("POST") && pathParts[1].equals("subtask")) {
-            return Endpoint.POST_SUBTASK;
-        }
-        if (requestMethod.equals("DELETE") && pathParts[1].equals("subtask")) {
-            return Endpoint.DELETE_SUBTASK;
-        }
-        if (requestMethod.equals("GET") && pathParts[1].equals("epics")) {
-            return Endpoint.GET_EPICS;
-        }
-        if (requestMethod.equals("GET") && pathParts[1].equals("epic")) {
-            return Endpoint.GET_EPIC;
-        }
-        if (requestMethod.equals("POST") && pathParts[1].equals("epic")) {
-            return Endpoint.POST_EPIC;
-        }
-        if (requestMethod.equals("GET") && pathParts[1].equals("prioritized")) {
-            return Endpoint.GET_PRIORITIZED;
-        }
-        if (requestMethod.equals("GET") && pathParts[1].equals("history")) {
-            return Endpoint.GET_HISTORY;
-        }
-        if (requestMethod.equals("DELETE") && pathParts[1].equals("epic")) {
-            return Endpoint.DELETE_EPIC;
-        }
-        if(pathParts.length == 4) {
-            if (requestMethod.equals("GET") && pathParts[2].equals("epicSubtasks")) {
-                return Endpoint.GET_EPIC_SUBTASKS;
-            }
-        }
-        return Endpoint.UNKNOWN;
-    }
+    public enum Endpoint { GET_ONE, GET_LIST, CREATE, UPDATE, DELETE,  UNKNOWN, GET_SUBTASKS_OF_EPIC }
 }

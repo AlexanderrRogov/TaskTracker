@@ -23,6 +23,7 @@ public class TaskSerializer implements JsonSerializer<Task> {
             jObject.addProperty("taskStatus", src.getTaskStatus().toString());
             jObject.addProperty("startTime", src.getStartTime().format(formatter));
             jObject.addProperty("endTime", src.getEndTime().format(formatter));
+            jObject.add(src.getType(), jObject);
             return jObject;
         }
     }

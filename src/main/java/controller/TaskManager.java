@@ -10,13 +10,15 @@ import java.util.List;
 public interface TaskManager {
     ArrayList<Task> getTasks();
 
+    Task updateTask(Task task);
+
     ArrayList<Subtask> getSubtasks();
 
     ArrayList<Subtask> getSubtasksForEpic(Integer id);
 
     void addTask(Task task);
 
-    void updateSubtask(Subtask subtask);
+    void updateSubtask(Task subtask);
 
     Subtask createSubtask(Task subtask);
 
@@ -48,4 +50,7 @@ public interface TaskManager {
 
     Task createTask(Task task);
 
+    List<Task> getPrioritizedTasks();
+
+    boolean hasIntersection(Task task);
 }

@@ -1,14 +1,24 @@
 package handlers;
 
 import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpHandler;
+import controller.TaskManager;
+import model.Task;
+import util.Managers;
 
 import java.io.IOException;
+import java.util.List;
 
-public class PrioritizedHandler extends BaseHttpHandler implements HttpHandler {
+public class PrioritizedHandler extends BaseHttpHandler  {
+
+
+    public PrioritizedHandler(TaskManager taskManager) {
+        super(taskManager);
+    }
 
     @Override
-    public void handle(HttpExchange exchange) throws IOException {
-        super.handle(exchange);
+    protected void processGetList(HttpExchange exchange) throws IOException {
+        List<Task> history = taskManager.getPrioritizedTasks();
+        String data = Managers.getGson().toJson(history);
+        sendText(exchange, data);
     }
 }
