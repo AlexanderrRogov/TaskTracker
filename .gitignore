@@ -1,3 +1,4 @@
-target
-.idea
-src/main/resources/Storage
+.classpath
+.project
+.settings/
+target/

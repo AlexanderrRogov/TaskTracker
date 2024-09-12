@@ -5,7 +5,7 @@ import java.util.Objects;
 
 public class Subtask extends Task {
 
-    private TaskType taskType = TaskType.SUBTASK;
+    private final TaskType taskType = TaskType.SUBTASK;
 
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
 
@@ -14,7 +14,7 @@ public class Subtask extends Task {
     }
 
     public Subtask(Task task) {
-        super(task.getName(), task.getInfo(), task.getTaskStatus(), task.getStartTime(), task.getDuration());
+        super(task);
     }
 
     @Override
@@ -43,4 +43,7 @@ public class Subtask extends Task {
                 '}';
     }
 
+    public TaskType getTaskType() {
+        return taskType;
+    }
 }

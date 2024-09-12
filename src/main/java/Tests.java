@@ -3,13 +3,8 @@ import model.Epic;
 import model.Subtask;
 import model.Task;
 import model.TaskStatus;
-import util.Managers;
 
-public class Main {
-    public static void main(String[] args) {
-        TaskManager taskManager = Managers.getDefault();
-        printAllTasks(taskManager);
-    }
+public class Tests {
 
     private static void printAllTasks(TaskManager taskManager) {
         Task task0 = new Task("Сервис транзакций_V1", "Написать сервис для передачи информации по проводкам", TaskStatus.NEW, "2024-04-25 13:30", "2024-04-25 14:30");
@@ -29,11 +24,11 @@ public class Main {
 
         taskManager.addTask(task0);
         taskManager.addTask(task1);
-        taskManager.addEpic(epic0);
-        taskManager.addEpic(epic1);
-        taskManager.addSubtask(subtask0);
-        taskManager.addSubtask(subtask1);
-        taskManager.addSubtask(subtask2);
+        taskManager.createEpic(epic0);
+        taskManager.createEpic(epic1);
+        taskManager.createSubtask(subtask0);
+        taskManager.createEpic(subtask1);
+        taskManager.createSubtask(subtask2);
 
 
         System.out.println("Задачи:");

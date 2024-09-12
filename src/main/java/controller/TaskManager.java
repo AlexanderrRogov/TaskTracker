@@ -10,15 +10,19 @@ import java.util.List;
 public interface TaskManager {
     ArrayList<Task> getTasks();
 
+    Task updateTask(Task task);
+
     ArrayList<Subtask> getSubtasks();
 
     ArrayList<Subtask> getSubtasksForEpic(Integer id);
 
     void addTask(Task task);
 
-    void addSubtask(Subtask subtask);
+    void updateSubtask(Task subtask);
 
-    void addEpic(Epic epic);
+    Subtask createSubtask(Task subtask);
+
+    Epic createEpic(Task epic);
 
     ArrayList<Epic> getEpics();
 
@@ -43,4 +47,10 @@ public interface TaskManager {
     void updateEpicStatus(Integer epicId);
 
     List<Task> getHistory();
+
+    Task createTask(Task task);
+
+    List<Task> getPrioritizedTasks();
+
+    boolean hasIntersection(Task task);
 }
